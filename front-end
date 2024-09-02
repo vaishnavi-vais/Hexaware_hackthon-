@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Question Builder</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        textarea { width: 100%; height: 100px; }
+        button { padding: 10px 20px; margin-top: 10px; }
+        .questions { margin-top: 20px; }
+        .question { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Automated Question Builder</h1>
+<textarea id="content" placeholder="Enter your content here..."></textarea>
+<br>
+<button onclick="generateQuestions()">Generate Questions</button>
+
+<div class="questions" id="questions"></div>
+
+<script>
+    function generateQuestions() {
+        const content = document.getElementById("content").value;
+
+        fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ content: content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const questionsDiv = document.getElementById("questions");
+            questionsDiv.innerHTML = "";
+
+            if (data.questions) {
+                data.questions.forEach(q => {
+                    const questionDiv = document.createElement("div");
+                    questionDiv.classList.add("question");
+                    questionDiv.textContent = q;
+                    questionsDiv.appendChild(questionDiv);
+                });
+            } else {
+                questionsDiv.textContent = "No questions generated.";
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+</body>
+</html>
